@@ -1,0 +1,96 @@
+#ifndef EC_CONTROLLER_MIMIC_POLICY_H_
+#define EC_CONTROLLER_MIMIC_POLICY_H_
+
+#include <array>
+#include <string>
+#include <vector>
+
+#include <Eigen/Geometry>
+#include <onnxruntime_cxx_api.h>
+
+namespace ec::mimic
+{
+constexpr size_t kJoints = 25;
+constexpr size_t kHistory = 10, kFuture = 10, kObservationSize = 810, kGoalSize = 600;
+constexpr size_t kLegacyGoalSize = kGoalSize + 9;
+using Joints = Eigen::Matrix<double, kJoints, 1>;
+using Action = std::array<float, kJoints>;
+
+struct Sample
+{
+  Joints position{Joints::Zero()}, velocity{Joints::Zero()};
+  Eigen::Vector3d angular_velocity{Eigen::Vector3d::Zero()};
+  Eigen::Quaterniond orientation{Eigen::Quaterniond::Identity()};
+  bool valid() const;
+};
+
+struct Frame
+{
+  Eigen::Vector3d root_position{Eigen::Vector3d::Zero()};
+  Eigen::Quaterniond orientation{Eigen::Quaterniond::Identity()};
+  Joints position{Joints::Zero()}, velocity{Joints::Zero()};
+  Eigen::Vector3d linear_velocity{Eigen::Vector3d::Zero()};
+  Eigen::Vector3d angular_velocity{Eigen::Vector3d::Zero()};
+};
+
+struct Metadata
+{
+  std::vector<std::string> joints;
+  Joints default_position, kp, kd, scale, lower, upper;
+  double control_dt{0.02};
+  double stand_height{0.68};
+  size_t goal_size{kGoalSize};
+  bool anchor_obs{false};
+  bool clip_joint_targets{true};
+  std::array<size_t, 3> waist_indices{};
+};
+
+Eigen::Matrix3d projectedYaw(const Eigen::Quaterniond & orientation);
+
+// No ROS or hardware access: the same engine is exercised by offline replay.
+class Policy
+{
+public:
+  Policy() = default;
+  Policy(const Policy &) = delete;
+  Policy & operator=(const Policy &) = delete;
+  // Cached ONNX tensors refer to this object's buffers.
+  Policy(Policy &&) = delete;
+  Policy & operator=(Policy &&) = delete;
+  void load(const std::string & model, const std::string & controllers_file, const std::string & motion);
+  void reset(const Sample & sample, bool align_heading = true);
+  // Override the next inference horizon (infer at index 0), preserving loaded
+  // motion frames for the controller's reference scheduling thread.
+  void setReference(const std::array<Frame, kFuture> & horizon);
+  Action infer(const Sample & sample, size_t frame);
+  Joints target() const;
+  const Metadata & metadata() const {return metadata_;}
+  const Frame & frame(size_t index) const {return frames_.at(index);}
+  size_t frameCount() const {return frames_.size();}
+  const std::array<float, kObservationSize> & observations() const {return observations_;}
+  const std::vector<float> & command() const {return command_;}
+
+private:
+  void buildObservation(const Sample & sample, size_t frame);
+  Eigen::Matrix3d torsoRotation(const Eigen::Quaterniond & root, const Joints & position) const;
+  Metadata metadata_;
+  std::vector<Frame> frames_;
+  std::array<Frame, kFuture> reference_{};
+  bool external_reference_{false};
+  std::array<Sample, kHistory> history_;
+  std::array<Action, kHistory> actions_{};
+  Action last_action_{};
+  Eigen::Matrix3d heading_offset_{Eigen::Matrix3d::Identity()};
+  Joints applied_{Joints::Zero()};
+  std::array<float, kObservationSize> observations_{};
+  std::vector<float> command_;
+  bool reset_{false};
+  Ort::Env env_{ORT_LOGGING_LEVEL_WARNING, "Hunter130SuperMimic"};
+  Ort::Session session_{nullptr};
+  Ort::MemoryInfo memory_{Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)};
+  Action output_buffer_{};
+  std::array<Ort::Value, 2> inputs_{Ort::Value{nullptr}, Ort::Value{nullptr}};
+  Ort::Value output_{nullptr};
+};
+}  // namespace ec::mimic
+#endif  // EC_CONTROLLER_MIMIC_POLICY_H_

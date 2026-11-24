@@ -1,0 +1,103 @@
+# Hunter130 AMP model_35000: policy and YAML joint order are identical.
+walk_controller:
+  ros__parameters:
+    joints:
+    - left_hip_pitch_joint
+    - left_hip_roll_joint
+    - left_hip_yaw_joint
+    - left_knee_joint
+    - left_ankle_pitch_joint
+    - left_ankle_roll_joint
+    - right_hip_pitch_joint
+    - right_hip_roll_joint
+    - right_hip_yaw_joint
+    - right_knee_joint
+    - right_ankle_pitch_joint
+    - right_ankle_roll_joint
+    - waist_yaw_joint
+    - waist_roll_joint
+    - waist_pitch_joint
+    - left_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - left_elbow_joint
+    - left_wrist_roll_joint
+    - right_shoulder_pitch_joint
+    - right_shoulder_roll_joint
+    - right_shoulder_yaw_joint
+    - right_elbow_joint
+    - right_wrist_roll_joint
+    policy_path: config/policy/amp.onnx
+    # No additional IMU pitch offset.
+    imu_pitch_offset_deg: 0.0
+    log_dir: "/home/milkyway/log/hunter130"
+
+amp_model:
+  ros__parameters:
+    input_name: obs
+    input_shape: [1, 336]
+    output_name: actions
+    output_shape: [1, 25]
+    frame_size: 84
+    history_length: 4
+    history_layout: time_major
+    history_reset: repeat_first_observation
+    policy_frequency_hz: 50
+    policy_period_s: 0.02
+    action_transform: default_position + action_scale * action
+    joint_names: [left_hip_pitch_joint, left_hip_roll_joint, left_hip_yaw_joint, left_knee_joint, left_ankle_pitch_joint,
+      left_ankle_roll_joint, right_hip_pitch_joint, right_hip_roll_joint, right_hip_yaw_joint, right_knee_joint,
+      right_ankle_pitch_joint, right_ankle_roll_joint, waist_yaw_joint, waist_roll_joint, waist_pitch_joint, left_shoulder_pitch_joint,
+      left_shoulder_roll_joint, left_shoulder_yaw_joint, left_elbow_joint, left_wrist_roll_joint, right_shoulder_pitch_joint,
+      right_shoulder_roll_joint, right_shoulder_yaw_joint, right_elbow_joint, right_wrist_roll_joint]
+    joints:
+      left_hip_pitch_joint: {default_position: -0.1, kp: 50.0, kd: 3.0, action_scale: 0.3, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 150.0}
+      left_hip_roll_joint: {default_position: 0.0, kp: 100.0, kd: 6.5, action_scale: 0.3, position_min: -0.5235988,
+        position_max: 2.9670597, torque_limit: 150.0}
+      left_hip_yaw_joint: {default_position: 0.0, kp: 50.0, kd: 3.0, action_scale: 1.0, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 150.0}
+      left_knee_joint: {default_position: 0.3, kp: 100.0, kd: 6.5, action_scale: 0.3, position_min: -0.0872665,
+        position_max: 2.6179939, torque_limit: 150.0}
+      left_ankle_pitch_joint: {default_position: -0.2, kp: 30.0, kd: 2.0, action_scale: 0.7, position_min: -0.8726646,
+        position_max: 0.5235988, torque_limit: 80.0}
+      left_ankle_roll_joint: {default_position: 0.0, kp: 30.0, kd: 2.0, action_scale: 0.3, position_min: -0.2617994,
+        position_max: 0.2617994, torque_limit: 38.0}
+      right_hip_pitch_joint: {default_position: -0.1, kp: 50.0, kd: 3.0, action_scale: 0.3, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 150.0}
+      right_hip_roll_joint: {default_position: 0.0, kp: 100.0, kd: 6.5, action_scale: 0.3, position_min: -2.9670597,
+        position_max: 0.5235988, torque_limit: 150.0}
+      right_hip_yaw_joint: {default_position: 0.0, kp: 50.0, kd: 3.0, action_scale: 1.0, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 150.0}
+      right_knee_joint: {default_position: 0.3, kp: 100.0, kd: 6.5, action_scale: 0.3, position_min: -0.0872665,
+        position_max: 2.6179939, torque_limit: 150.0}
+      right_ankle_pitch_joint: {default_position: -0.2, kp: 30.0, kd: 2.0, action_scale: 0.7, position_min: -0.8726646,
+        position_max: 0.5235988, torque_limit: 80.0}
+      right_ankle_roll_joint: {default_position: 0.0, kp: 30.0, kd: 2.0, action_scale: 0.3, position_min: -0.2617994,
+        position_max: 0.2617994, torque_limit: 38.0}
+      waist_yaw_joint: {default_position: 0.0, kp: 50.0, kd: 3.0, action_scale: 1.0, position_min: -2.0071286, position_max: 3.577925,
+        torque_limit: 150.0}
+      waist_roll_joint: {default_position: 0.0, kp: 30.0, kd: 2.0, action_scale: 1.0, position_min: -0.5235988,
+        position_max: 0.5235988, torque_limit: 140.0}
+      waist_pitch_joint: {default_position: 0.0, kp: 30.0, kd: 2.0, action_scale: 1.0, position_min: -0.5235988,
+        position_max: 0.5235988, torque_limit: 112.5}
+      left_shoulder_pitch_joint: {default_position: 0.2, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -3.577925,
+        position_max: 2.0071286, torque_limit: 30.0}
+      left_shoulder_roll_joint: {default_position: 0.18, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -0.1745329,
+        position_max: 3.577925, torque_limit: 30.0}
+      left_shoulder_yaw_joint: {default_position: 0.0, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 30.0}
+      left_elbow_joint: {default_position: 0.6, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -0.6108652,
+        position_max: 2.0943951, torque_limit: 30.0}
+      left_wrist_roll_joint: {default_position: 0.0, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 30.0}
+      right_shoulder_pitch_joint: {default_position: 0.2, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -3.577925,
+        position_max: 2.0071286, torque_limit: 30.0}
+      right_shoulder_roll_joint: {default_position: -0.18, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -3.577925,
+        position_max: 0.1745329, torque_limit: 30.0}
+      right_shoulder_yaw_joint: {default_position: 0.0, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 30.0}
+      right_elbow_joint: {default_position: 0.6, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -0.6108652,
+        position_max: 2.0943951, torque_limit: 30.0}
+      right_wrist_roll_joint: {default_position: 0.0, kp: 15.0, kd: 1.0, action_scale: 0.5, position_min: -2.7925268,
+        position_max: 2.7925268, torque_limit: 30.0}

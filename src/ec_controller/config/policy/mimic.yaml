@@ -1,0 +1,155 @@
+# Mode 4: neural stand -> reference transition -> motion -> transition -> neural stand.
+mimic_controller:
+  ros__parameters:
+    joints:
+    - left_hip_pitch_joint
+    - left_hip_roll_joint
+    - left_hip_yaw_joint
+    - left_knee_joint
+    - left_ankle_pitch_joint
+    - left_ankle_roll_joint
+    - right_hip_pitch_joint
+    - right_hip_roll_joint
+    - right_hip_yaw_joint
+    - right_knee_joint
+    - right_ankle_pitch_joint
+    - right_ankle_roll_joint
+    - waist_yaw_joint
+    - waist_roll_joint
+    - waist_pitch_joint
+    - left_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - left_elbow_joint
+    - left_wrist_roll_joint
+    - right_shoulder_pitch_joint
+    - right_shoulder_roll_joint
+    - right_shoulder_yaw_joint
+    - right_elbow_joint
+    - right_wrist_roll_joint
+    # Standing pose and height default to the selected model metadata.
+    # anchor_50h_PD_NoClip 500000-step actor: 810 + 609 inputs; unclipped targets.
+    policy_path: config/policy/mimic.onnx
+    motion_path: config/motions/disco.csv
+    # No additional IMU pitch offset.
+    imu_pitch_offset_deg: 0.0
+    stand_before_duration: 1.0
+    # Direct model-PD takeover; hardware last_command_* history is not required.
+    activation_duration: 0.0
+    preparation_duration: 3.0
+    return_duration: 3.0
+    start_position_tolerance: 0.35
+    log_dir: /home/milkyway/log/hunter130
+
+# Mode 5 / CH7: calibrated Meta full-body references.
+quest_controller:
+  ros__parameters:
+    joints:
+    - left_hip_pitch_joint
+    - left_hip_roll_joint
+    - left_hip_yaw_joint
+    - left_knee_joint
+    - left_ankle_pitch_joint
+    - left_ankle_roll_joint
+    - right_hip_pitch_joint
+    - right_hip_roll_joint
+    - right_hip_yaw_joint
+    - right_knee_joint
+    - right_ankle_pitch_joint
+    - right_ankle_roll_joint
+    - waist_yaw_joint
+    - waist_roll_joint
+    - waist_pitch_joint
+    - left_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - left_elbow_joint
+    - left_wrist_roll_joint
+    - right_shoulder_pitch_joint
+    - right_shoulder_roll_joint
+    - right_shoulder_yaw_joint
+    - right_elbow_joint
+    - right_wrist_roll_joint
+    # Standing pose and height default to the selected model metadata.
+    # Quest and Mimic use the same NoClip actor and metadata gains.
+    # anchor_50h_PD_NoClip 500000-step actor: 810 + 609 inputs; unclipped targets.
+    policy_path: config/policy/mimic.onnx
+    stand_before_duration: 1.0
+    # Direct model-PD takeover; hardware last_command_* history is not required.
+    activation_duration: 0.0
+    preparation_duration: 3.0
+    return_duration: 3.0
+    start_position_tolerance: 0.35
+    log_dir: /home/milkyway/log/hunter130
+
+mimic_model:
+  ros__parameters:
+    schema_version: 2
+    model_type: supermimic
+    anchor_obs: true
+    position_feedback: zero
+    action_mode: default_offset
+    joint_target_clip: none
+    input_size: 810
+    goal_size: 609
+    joint_count: 25
+    reference_frames: 10
+    reference_width: 60
+    history_frames: 10
+    proprio_width: 81
+    goal_start_offset: 0
+    reference_joint_position: relative_to_default
+    history_layout: term_major_oldest_first
+    goal_layout: 10x60_then_zero_position3_then_torso_rotation_first_two_columns_row_major6
+    normalization: embedded_in_onnx
+    policy_dt: 0.02
+    torso_joint_names: [waist_yaw_joint, waist_roll_joint, waist_pitch_joint]
+    torso_joint_axes: [0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+    joint_names: [left_hip_pitch_joint, left_hip_roll_joint, left_hip_yaw_joint, left_knee_joint, left_ankle_pitch_joint,
+      left_ankle_roll_joint, right_hip_pitch_joint, right_hip_roll_joint, right_hip_yaw_joint, right_knee_joint,
+      right_ankle_pitch_joint, right_ankle_roll_joint, waist_yaw_joint, waist_roll_joint, waist_pitch_joint, left_shoulder_pitch_joint,
+      left_shoulder_roll_joint, left_shoulder_yaw_joint, left_elbow_joint, left_wrist_roll_joint, right_shoulder_pitch_joint,
+      right_shoulder_roll_joint, right_shoulder_yaw_joint, right_elbow_joint, right_wrist_roll_joint]
+    stand_position: [-0.1, 0.0, 0.0, 0.3, -0.2, 0.0, -0.1, 0.0, 0.0, 0.3, -0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.18, 0.0,
+      0.6, 0.0, 0.2, -0.18, 0.0, 0.6, 0.0]
+    lower: [-2.7925268, -0.5235988, -2.7925268, -0.0872665, -0.8726646, -0.2617994, -2.7925268, -2.9670597, -2.7925268,
+      -0.0872665, -0.8726646, -0.2617994, -2.0071286, -0.5235988, -0.5235988, -3.577925, -0.1745329, -2.7925268,
+      -0.6108652, -2.7925268, -3.577925, -3.577925, -2.7925268, -0.6108652, -2.7925268]
+    upper: [2.7925268, 2.9670597, 2.7925268, 2.6179939, 0.5235988, 0.2617994, 2.7925268, 0.5235988, 2.7925268, 2.6179939,
+      0.5235988, 0.2617994, 3.577925, 0.5235988, 0.5235988, 2.0071286, 3.577925, 2.7925268, 2.0943951, 2.7925268,
+      2.0071286, 0.1745329, 2.7925268, 2.0943951, 2.7925268]
+    kp: [50.0, 100.0, 50.0, 100.0, 30.0, 30.0, 50.0, 100.0, 50.0, 100.0, 30.0, 30.0, 50.0, 30.0, 30.0, 15.0, 15.0,
+      15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0]
+    kd: [3.0, 6.5, 3.0, 6.5, 2.0, 2.0, 3.0, 6.5, 3.0, 6.5, 2.0, 2.0, 3.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      1.0, 1.0, 1.0, 1.0]
+    action_scale: [0.3, 0.3, 1.0, 0.3, 0.7, 0.3, 0.3, 0.3, 1.0, 0.3, 0.7, 0.3, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5,
+      0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    stand_height: 0.68
+    motor_parameters:
+      left_hip_pitch_joint: {stiffness: 50.0, damping: 3.0, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      left_hip_roll_joint: {stiffness: 100.0, damping: 6.5, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      left_hip_yaw_joint: {stiffness: 50.0, damping: 3.0, armature: 0.025, effort: 150.0, action_scale: 1.0}
+      left_knee_joint: {stiffness: 100.0, damping: 6.5, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      left_ankle_pitch_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 80.0, action_scale: 0.7}
+      left_ankle_roll_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 38.0, action_scale: 0.3}
+      right_hip_pitch_joint: {stiffness: 50.0, damping: 3.0, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      right_hip_roll_joint: {stiffness: 100.0, damping: 6.5, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      right_hip_yaw_joint: {stiffness: 50.0, damping: 3.0, armature: 0.025, effort: 150.0, action_scale: 1.0}
+      right_knee_joint: {stiffness: 100.0, damping: 6.5, armature: 0.025, effort: 150.0, action_scale: 0.3}
+      right_ankle_pitch_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 80.0, action_scale: 0.7}
+      right_ankle_roll_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 38.0, action_scale: 0.3}
+      waist_yaw_joint: {stiffness: 50.0, damping: 3.0, armature: 0.01, effort: 150.0, action_scale: 1.0}
+      waist_roll_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 140.0, action_scale: 1.0}
+      waist_pitch_joint: {stiffness: 30.0, damping: 2.0, armature: 0.01, effort: 112.5, action_scale: 1.0}
+      left_shoulder_pitch_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      left_shoulder_roll_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      left_shoulder_yaw_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      left_elbow_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      left_wrist_roll_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      right_shoulder_pitch_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      right_shoulder_roll_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      right_shoulder_yaw_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      right_elbow_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+      right_wrist_roll_joint: {stiffness: 15.0, damping: 1.0, armature: 0.005, effort: 30.0, action_scale: 0.5}
+    obs_term_scale: [1.0, 5.0, 2.0, 1.0, 1.0]
+    goal_term_scale: [1.0, 5.0, 1.0, 2.0, 1.0, 1.0]
